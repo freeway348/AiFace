@@ -1,0 +1,19 @@
+# yml是tomcat官方指定的配置文件，是properties配置文件的升级
+server:
+  port: 9999
+  tomcat:
+    uri-encoding: utf-8
+spring:
+    datasource:
+      driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/ai?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
+      username: root
+      password: Chen1656497721*
+    redis:
+      host: localhost
+      port: 6379
+      password: abc123456
+      database: 0 # 默认数据库，默认0号数据库
+
+
+

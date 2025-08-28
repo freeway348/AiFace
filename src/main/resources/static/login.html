@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录系统</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 50px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 30px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-button.active {
+            color: #4CAF50;
+            border-bottom-color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .tab-button:hover {
+            background-color: #f9f9f9;
+        }
+
+        .login-form {
+            display: none;
+        }
+
+        .login-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .verification-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .verification-group input {
+            flex: 1;
+        }
+
+        .verification-group button {
+            flex: 0 0 auto;
+            padding: 12px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .verification-group button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .camera-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        #video {
+            width: 100%;
+            max-width: 320px;
+            background-color: #000;
+            border-radius: 4px;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        #photo {
+            max-width: 320px;
+            margin: 10px auto;
+            display: none;
+            border-radius: 4px;
+        }
+
+        .camera-buttons {
+            margin: 15px 0;
+        }
+
+        .camera-buttons button {
+            margin: 0 5px;
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .camera-buttons button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .login-button:hover {
+            background-color: #45a049;
+        }
+
+        .login-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .message.success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+
+        .message.error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+
+        .message.info {
+            background-color: #d9edf7;
+            color: #31708f;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <div class="login-header">
+        <h1>用户登录</h1>
+    </div>
+
+    <!-- 登录方式切换标签 -->
+    <div class="login-tabs">
+        <button class="tab-button active" data-tab="password">密码登录</button>
+        <button class="tab-button" data-tab="email">邮箱验证码</button>
+        <button class="tab-button" data-tab="face">人脸识别</button>
+    </div>
+
+    <!-- 用户名密码登录表单 -->
+    <div id="password-form" class="login-form active">
+        <div class="form-group">
+            <label for="username">用户名:</label>
+            <input type="text" id="username" name="username" placeholder="请输入用户名">
+        </div>
+
+        <div class="form-group">
+            <label for="password">密码:</label>
+            <input type="password" id="password" name="password" placeholder="请输入密码">
+        </div>
+
+        <button id="loginPasswordButton" class="login-button">登录</button>
+    </div>
+
+    <!-- 邮箱验证码登录表单 -->
+    <div id="email-form" class="login-form">
+        <div class="form-group">
+            <label for="email">邮箱:</label>
+            <input type="email" id="email" name="email" placeholder="请输入邮箱地址">
+        </div>
+
+        <div class="form-group verification-group">
+            <input type="text" id="emailCode" name="emailCode" placeholder="请输入验证码">
+            <button id="sendCodeButton">发送验证码</button>
+        </div>
+
+        <button id="loginEmailButton" class="login-button">登录</button>
+    </div>
+
+    <!-- 人脸识别登录表单 -->
+    <div id="face-form" class="login-form">
+        <div class="camera-container">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas"></canvas>
+            <img id="photo" alt="拍摄的照片">
+
+            <div class="camera-buttons">
+                <button id="startFaceButton">打开摄像头</button>
+                <button id="captureFaceButton" disabled>拍照</button>
+            </div>
+        </div>
+
+        <button id="loginFaceButton" class="login-button" disabled>人脸识别登录</button>
+    </div>
+
+    <!-- 消息提示区域 -->
+    <div id="message" class="message" style="display: none;"></div>
+</div>
+
+<script>
+    // 获取DOM元素
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const loginForms = document.querySelectorAll('.login-form');
+    const messageDiv = document.getElementById('message');
+
+    // 密码登录相关元素
+    const loginPasswordButton = document.getElementById('loginPasswordButton');
+
+    // 邮箱验证码登录相关元素
+    const emailInput = document.getElementById('email');
+    const emailCodeInput = document.getElementById('emailCode');
+    const sendCodeButton = document.getElementById('sendCodeButton');
+    const loginEmailButton = document.getElementById('loginEmailButton');
+
+    // 人脸识别登录相关元素
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const photo = document.getElementById('photo');
+    const startFaceButton = document.getElementById('startFaceButton');
+    const captureFaceButton = document.getElementById('captureFaceButton');
+    const loginFaceButton = document.getElementById('loginFaceButton');
+
+    let stream = null;
+    // 切换登录方式标签
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const tabName = button.getAttribute('data-tab');
+
+            // 更新标签状态
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            // 显示对应的表单
+            loginForms.forEach(form => form.classList.remove('active'));
+            document.getElementById(`${tabName}-form`).classList.add('active');
+
+            // 清空消息
+            hideMessage();
+        });
+    });
+
+    // 密码登录
+    loginPasswordButton.addEventListener('click', async () => {
+        try {
+            // 获取表单数据
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // 简单验证
+            if (!username || !password) {
+                messageDiv.textContent = '请填写用户名密码';
+                return;
+            }
+
+            // 发送到后端
+            const response = await fetch('/user/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                })
+            });
+
+            if (response.ok) {
+                messageDiv.textContent = '用户登录成功！';
+                window.location.href = '/home.html';
+
+            } else {
+                messageDiv.textContent = '登录失败: ' + response.statusText;
+            }
+
+        } catch (err) {
+            console.error('登录错误:', err);
+            messageDiv.textContent = '登录失败: ' + err.message;
+        }
+
+    });
+
+    // 发送邮箱验证码
+    sendCodeButton.addEventListener('click', async () => {
+        try {
+            // 获取用户填写的邮箱
+            const email = document.getElementById('email').value;
+
+            // 验证邮箱是否填写
+            if (!email) {
+                messageDiv.textContent = '请先填写邮箱地址';
+                return;
+            }
+
+            // 禁用按钮并显示加载状态
+            sendCodeButton.disabled = true;
+            sendCodeButton.textContent = '发送中...';
+            messageDiv.textContent = '正在发送验证码...';
+
+            // 发送到后端
+            const response = await fetch('/user/mail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email
+                })
+            });
+
+            if (response.ok) {
+                messageDiv.textContent = '验证码已发送至您的邮箱，请查收！';
+            } else {
+                messageDiv.textContent = '发送验证码失败: ' + response.statusText;
+            }
+        } catch (err) {
+            console.error('发送验证码错误:', err);
+            messageDiv.textContent = '发送验证码失败: ' + err.message;
+        } finally {
+            // 恢复按钮状态
+            sendCodeButton.disabled = false;
+            sendCodeButton.textContent = '获取验证码';
+        }
+    });
+
+    // 邮箱验证码登录
+    loginEmailButton.addEventListener('click', async () => {
+        try {
+            // 获取表单数据
+            const email = document.getElementById('email').value;
+            const veriCode = document.getElementById('emailCode').value;
+
+            // 简单验证
+            if (!email) {
+                messageDiv.textContent = '请填写邮箱';
+                return;
+            }
+            else if (!veriCode)
+            {
+                messageDiv.textContent = '请填写验证码';
+                return;
+            }
+
+            // 发送到后端
+            const response = await fetch('/user/loginMail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    code:veriCode
+                })
+            });
+
+            if (response.ok) {
+                messageDiv.textContent = '用户登录成功！';
+                window.location.href = '/home.html';
+
+            } else {
+                messageDiv.textContent = '登录失败: ' + response.statusText;
+            }
+
+        } catch (err) {
+            console.error('登录错误:', err);
+            messageDiv.textContent = '登录失败: ' + err.message;
+        }
+
+    });
+
+    // 打开摄像头
+    startFaceButton.addEventListener('click', async () => {
+        try {
+            messageDiv.textContent = '正在请求摄像头权限...';
+            stream = await navigator.mediaDevices.getUserMedia({//此处就是打开摄像头
+                video: { width: 320, height: 240 },
+                audio: false
+            });
+            video.srcObject = stream;
+            messageDiv.textContent = '摄像头已打开，可以拍照了';
+            startFaceButton.disabled = true;
+            captureFaceButton.disabled = false;
+        } catch (err) {
+            console.error('摄像头访问错误:', err);
+            messageDiv.textContent = '无法访问摄像头: ' + err.message;
+        }
+    });
+
+    // 拍照
+    captureFaceButton.addEventListener('click', () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const dataUrl = canvas.toDataURL('image/png');//将图片 转成 base64的格式
+        photo.src = dataUrl;
+        photo.style.display = 'block';
+
+        messageDiv.textContent = '照片已拍摄，可以登录了';
+        captureFaceButton.disabled = true;
+        loginFaceButton.disabled = false;
+
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+            startFaceButton.disabled = false;
+            captureFaceButton.disabled = true;
+        }
+        video.style.display = 'none';
+    });
+    // 人脸识别登录
+    loginFaceButton.addEventListener('click', async () => {
+        try {
+            // 获取表单数据
+            const imageBase64 = photo.src.split(',')[1];
+
+            // 简单验证
+            if (!imageBase64)
+            {
+                messageDiv.textContent = '请上传人脸照片';
+                return;
+            }
+
+            // 发送到后端
+            const response = await fetch('/user/loginFace', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    imagetoken: imageBase64
+                })
+            });
+
+            if (response.ok) {
+                messageDiv.textContent = '用户登录成功！';
+                //跳转到登录界面login.html
+                window.location.href = '/home.html';
+
+            } else {
+                messageDiv.textContent = '登录失败: ' + response.statusText;
+            }
+
+        } catch (err) {
+            console.error('登录错误:', err);
+            messageDiv.textContent = '登录失败: ' + err.message;
+        }
+
+    });
+    // 页面卸载时关闭摄像头
+    window.addEventListener('beforeunload', () => {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+    });
+
+    // 验证码倒计时功能
+    function startCountdown(seconds) {
+        let count = seconds;
+        sendCodeButton.disabled = true;
+        sendCodeButton.textContent = `${count}秒后重发`;
+
+        const timer = setInterval(() => {
+            count--;
+            sendCodeButton.textContent = `${count}秒后重发`;
+
+            if (count <= 0) {
+                clearInterval(timer);
+                sendCodeButton.disabled = false;
+                sendCodeButton.textContent = '发送验证码';
+            }
+        }, 1000);
+    }
+
+    // 显示消息
+    function showMessage(text, type) {
+        messageDiv.textContent = text;
+        messageDiv.className = 'message ' + type;
+        messageDiv.style.display = 'block';
+    }
+
+    // 隐藏消息
+    function hideMessage() {
+        messageDiv.style.display = 'none';
+    }
+
+    window.addEventListener('beforeunload', () => {// 刷新页面
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+    });
+</script>
+</body>
+</html>
