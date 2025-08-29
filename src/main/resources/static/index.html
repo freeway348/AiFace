@@ -138,6 +138,8 @@
         // 处理加粗
         processedText = processedText.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
 
+        processedText = processedText.replace(/^###([^*]+)/g, '');
+
         return processedText;
     }
 
