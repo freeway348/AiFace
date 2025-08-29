@@ -15,5 +15,15 @@ spring:
       password: abc123456
       database: 0 # 默认数据库，默认0号数据库
 
+deepseek:
+  api:
+    url: http://localhost:11434/api/chat
+    model: deepseek-r1:7b
+
+baidu:
+  api:
+    appid: 7025056
+    apikey: Qv1h2VgziPWcEhIDzEApUCuX
+    secretkey: 0dz9b9CjneqJ9FdY3DAPHlnt6fN1pSko
 
 

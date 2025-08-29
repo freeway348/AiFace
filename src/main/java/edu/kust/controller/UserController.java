@@ -41,7 +41,7 @@ public class UserController {
     @Autowired
     private RedisTemplate redisTemplate;
 
-    public static final String APP_ID = "7025056";
+    public static final String APP_ID = "70v25056";
     public static final String API_KEY = "Qv1h2VgziPWcEhIDzEApUCuX";
     public static final String SECRET_KEY = "0dz9b9CjneqJ9FdY3DAPHlnt6fN1pSko";
 
@@ -149,7 +149,7 @@ public class UserController {
         // 人脸识别
         JSONObject res = aipFace.search(loginFace.getImagetoken(), imageType, "group1", null);
 
-        double score = res.getJSONObject("result").getDouble("score");
+        double score = res.getJSONObject("result").getJSONArray("user_list").getJSONObject(0).getDouble("score");
 
         return score > 90 ? "success" : "fail";
     }
