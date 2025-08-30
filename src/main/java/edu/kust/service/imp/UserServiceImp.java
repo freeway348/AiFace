@@ -3,6 +3,8 @@ package edu.kust.service.imp;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import edu.kust.dto.LoginFace;
+import edu.kust.dto.LoginMail;
 import edu.kust.dto.LoginUser;
 import edu.kust.entity.User;
 import edu.kust.mapper.UserMapper;
@@ -38,5 +40,45 @@ public class UserServiceImp extends ServiceImpl<UserMapper, User> implements Use
             return true;
 
         return false;
+    }
+
+    @Override
+    public User getUserInfo(LoginUser loginUser) {
+        // 构造查询条件
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", loginUser.getUsername());
+        queryWrapper.eq("password", loginUser.getPassword());
+
+        // 查询用户信息
+        User user = this.getOne(queryWrapper);
+
+        // 返回用户信息（如果找到的话）
+        return user;
+    }
+
+    @Override
+    public User getUserInfo(LoginFace loginFace) {
+        // 构造查询条件
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("imagetoken", loginFace.getImagetoken());
+
+        // 查询用户信息
+        User user = this.getOne(queryWrapper);
+
+        // 返回用户信息（如果找到的话）
+        return user;
+    }
+
+    @Override
+    public User getUserInfo(LoginMail loginMail) {
+        // 构造查询条件
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("email", loginMail.getEmail());
+
+        // 查询用户信息
+        User user = this.getOne(queryWrapper);
+
+        // 返回用户信息（如果找到的话）
+        return user;
     }
 }
