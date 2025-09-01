@@ -1,84 +1,65 @@
-<!-- src/views/Register.vue -->
 <template>
   <div>
-    <h1 class="header">
-      <span>用户信息注册</span>
-      <span>摄像头拍照上传</span>
-    </h1>
+    <div class="login-container">
+      <h1 class="page-title">用户信息注册系统</h1>
 
-    <div class="main-layout">
-      <div class="form-container">
-        <div class="input-group">
-          <label for="username">用户名:</label>
-          <input type="text" id="username" v-model="username" />
+      <div class="content-wrapper">
+        <!-- 左侧表单 -->
+        <div class="form-panel">
+          <label class="form-label">用户名</label>
+          <input v-model="username" placeholder="请输入用户名" class="form-input" />
+
+          <label class="form-label">密码</label>
+          <input v-model="password" type="password" placeholder="请输入密码" class="form-input" />
+
+          <label class="form-label">邮箱</label>
+          <input v-model="email" type="email" placeholder="请输入邮箱" class="form-input" />
+
+          <label class="form-label">验证码</label>
+          <input v-model="veriCode" placeholder="请输入验证码" class="form-input" />
+
+          <!-- 表单按钮 -->
+          <div class="form-actions">
+            <button @click="sendVerificationCode" :disabled="isVeriButtonDisabled">
+              {{ veriButtonText }}
+            </button>
+            <button @click="registerUser">注册</button>
+
+            <button @click="goToLogin" class="text-btn">前往登录</button>
+          </div>
         </div>
 
-        <div class="input-group">
-          <label for="password">密码:</label>
-          <input type="password" id="password" v-model="password" />
-        </div>
+        <!--摄像头-->
+        <div class="camera-panel">
+          <video
+              v-show="showVideo"
+              ref="video"
+              autoplay
+              playsinline
+              class="video"
+          ></video>
+          <canvas ref="canvas" style="display: none"></canvas>
+          <img v-if="photoSrc" :src="photoSrc" class="photo" alt="photo" />
 
-        <div class="input-group">
-          <label for="email">邮箱:</label>
-          <input type="email" id="email" v-model="email" />
-        </div>
-
-        <div class="input-group">
-          <label for="veriCode">验证码:</label>
-          <input type="tel" id="veriCode" v-model="veriCode" />
-        </div>
-      </div>
-
-      <div class="camera-container">
-        <video
-            ref="video"
-            class="video"
-            autoplay
-            playsinline
-            :style="{ display: showVideo ? 'block' : 'none' }"
-        ></video>
-        <canvas ref="canvas" style="display:none;"></canvas>
-        <img
-            :src="photoSrc"
-            class="photo"
-            alt="拍摄的照片"
-            :style="{ display: photoSrc ? 'block' : 'none' }"
-        />
-
-        <div class="camera-buttons">
-          <button
-              @click="startCamera"
-              :disabled="isStartButtonDisabled"
-          >
-            打开摄像头
-          </button>
-          <button
-              @click="capturePhoto"
-              :disabled="isCaptureButtonDisabled"
-          >
-            拍照
-          </button>
+          <div class="camera-buttons">
+            <button @click="startCamera" :disabled="isStartButtonDisabled">
+              打开摄像头
+            </button>
+            <button @click="capturePhoto" :disabled="isCaptureButtonDisabled">
+              拍照
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="register-button-container">
-      <button
-          @click="sendVerificationCode"
-          :disabled="isVeriButtonDisabled"
+      <!--消息提示-->
+      <div
+          v-show="message.show"
+          class="message"
+          :style="{ display: message.show ? 'block' : 'none' }"
       >
-        {{ veriButtonText }}
-      </button>
-      <button @click="registerUser">注册</button>
-      <button @click="goToLogin">前往登录</button>
-    </div>
-
-    <div
-        class="message"
-        :class="message.type"
-        :style="{ display: message.show ? 'block' : 'none' }"
-    >
-      {{ message.text }}
+        {{ message.text }}
+      </div>
     </div>
   </div>
 </template>
@@ -108,13 +89,12 @@ export default {
     }
   },
   methods: {
-    /* 通用提示 */
     showMessage (text, type = 'info') {
       this.message = { show: true, text, type }
       setTimeout(() => (this.message.show = false), 3000)
     },
 
-    /* 打开摄像头 */
+    // 打开摄像头
     async startCamera () {
       try {
         this.showMessage('正在请求摄像头权限...', 'info')
@@ -131,7 +111,7 @@ export default {
       }
     },
 
-    /* 拍照 */
+    // 拍照
     capturePhoto () {
       const video = this.$refs.video
       const canvas = this.$refs.canvas
@@ -150,7 +130,7 @@ export default {
       this.showVideo = false
     },
 
-    /* 发送验证码 */
+
     async sendVerificationCode () {
       if (!this.email) {
         this.showMessage('请先填写邮箱地址', 'error')
@@ -159,6 +139,7 @@ export default {
       this.isVeriButtonDisabled = true
       this.veriButtonText = '发送中...'
       try {
+        // 等待异步
         await this.$axios({
           method: 'POST',
           url: 'http://localhost:9999/user/mail',
@@ -174,7 +155,7 @@ export default {
       }
     },
 
-    /* 倒计时 */
+    // 倒计时
     startCountdown (seconds) {
       let count = seconds
       this.veriButtonText = `${count}秒后重发`
@@ -189,7 +170,6 @@ export default {
       }, 1000)
     },
 
-    /* 用户注册 */
     async registerUser () {
       if (!this.username || !this.password || !this.email || !this.veriCode) {
         this.showMessage('请填写所有必填字段', 'error')
@@ -220,7 +200,7 @@ export default {
       }
     },
 
-    /* 前往登录 */
+
     goToLogin () {
       this.$router.push('/login')
     }
@@ -236,52 +216,79 @@ export default {
 <style scoped lang="less">
 body {
   font-family: Arial, sans-serif;
+  background: #f5f5f5;
+}
+
+.login-container {
   max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+  margin: 50px auto;
+  padding: 40px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
-.header {
+
+// 标题居中
+.page-title {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 26px;
+  color: #333;
+}
+
+// 左右两栏
+.content-wrapper {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 40px;
 }
-.main-layout {
-  display: flex;
-  justify-content: space-between;
+
+.form-panel {
+  flex: 1 1 320px;
 }
-.form-container {
-  width: 50%;
-  padding-right: 100px;
-}
-.input-group {
-  margin-bottom: 15px;
-}
-.input-group label {
+
+.form-label {
   display: block;
   margin-bottom: 5px;
+  font-weight: normal;
 }
-.input-group input {
+
+.form-input {
   width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  margin-bottom: 20px;
 }
-.camera-container {
-  margin: 20px 0;
-  max-width: 640px;
+
+.form-input:last-child {
+  margin-bottom: 0;
 }
-.video {
-  width: 100%;
-  max-width: 640px;
-  background-color: #000;
+
+// 表单底部按钮区
+.form-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-.canvas {
-  display: none;
+
+.camera-panel {
+  flex: 1 1 320px;
+  text-align: center;
 }
+
+.video,
 .photo {
-  max-width: 640px;
-  margin-top: 10px;
+  width: 100%;
+  max-width: 320px;
+  background: #000;
+  border-radius: 4px;
 }
+
+.camera-buttons {
+  margin-top: 15px;
+}
+
 button {
   padding: 10px 15px;
   background-color: #4caf50;
@@ -291,33 +298,19 @@ button {
   cursor: pointer;
   margin-right: 10px;
 }
+
 button:hover {
   background-color: #45a049;
 }
+
 button:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
 }
+
 .message {
   margin-top: 15px;
   padding: 10px;
   border-radius: 4px;
-}
-.message.success {
-  background-color: #dff0d8;
-  color: #3c763d;
-}
-.message.error {
-  background-color: #f2dede;
-  color: #a94442;
-}
-.message.info {
-  background-color: #d9edf7;
-  color: #31708f;
-}
-.register-button-container {
-  display: flex;
-  align-items: center;
-  margin-top: 20px;
 }
 </style>

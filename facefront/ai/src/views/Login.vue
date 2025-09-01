@@ -1,9 +1,8 @@
-<!-- src/views/Login.vue -->
 <template>
   <div class="login-container">
     <div class="login-header"><h1>用户登录</h1></div>
 
-    <!-- 标签 -->
+    <!--标签-->
     <div class="login-tabs">
       <button
           v-for="t in tabs"
@@ -15,7 +14,7 @@
       </button>
     </div>
 
-    <!-- 1. 密码 -->
+    <!--密码-->
     <div v-if="tab === 'password'" class="login-form active">
       <div class="form-group">
         <label>用户名:</label>
@@ -35,7 +34,7 @@
       </div>
     </div>
 
-    <!-- 2. 邮箱验证码 -->
+    <!--邮箱验证码-->
     <div v-if="tab === 'email'" class="login-form active">
       <div class="form-group">
         <label>邮箱:</label>
@@ -57,7 +56,7 @@
       </div>
     </div>
 
-    <!-- 3. 人脸识别 -->
+    <!--人脸识别-->
     <div v-if="tab === 'face'" class="login-form active">
       <div class="camera-container">
         <video v-show="showVideo" ref="video" autoplay playsinline></video>
@@ -128,7 +127,7 @@ export default {
       this.msgType = type
     },
 
-    /* 1. 密码登录 */
+    // 密码登录
     handlePasswordLogin() {
       if (!this.form.username || !this.form.password) return
       this.$axios({
@@ -160,7 +159,7 @@ export default {
           .catch(() => alert('登录失败'))
     },
 
-    /* 2. 发送邮箱验证码 */
+    // 发送邮箱验证码
     handleSendCode() {
       if (!this.form.email) return this.showMsg('请填写邮箱', 'error')
       this.counting = true
@@ -187,7 +186,7 @@ export default {
           })
     },
 
-    /* 3. 邮箱验证码登录 */
+    // 邮箱验证码登录
     handleEmailLogin() {
       if (!this.form.email || !this.form.emailCode)
         return this.showMsg('请填写完整', 'error')
@@ -216,7 +215,7 @@ export default {
           .catch((e) => this.showMsg(e?.response?.data || '登录失败', 'error'))
     },
 
-    /* 4. 打开摄像头 */
+    // 打开摄像头
     handleOpenCamera() {
       navigator.mediaDevices
           .getUserMedia({ video: { width: 320, height: 240 } })
@@ -228,7 +227,7 @@ export default {
           .catch(() => this.showMsg('无法访问摄像头', 'error'))
     },
 
-    /* 5. 拍照 */
+    // 拍照
     handleCaptureFace() {
       const c = this.$refs.canvas
       const v = this.$refs.video
@@ -242,7 +241,7 @@ export default {
       this.showVideo = false
     },
 
-    /* 6. 人脸识别登录 */
+    // 人脸识别登录
     handleFaceLogin() {
       const base64 = this.photoSrc.split(',')[1]
       if (!base64) return this.showMsg('请拍照', 'error')

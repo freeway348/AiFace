@@ -1,7 +1,6 @@
-<!-- src/views/Chat.vue -->
 <template>
   <div class="wrap">
-    <!-- 侧边栏 -->
+    <!--侧边栏-->
     <aside class="sidebar">
       <h2>智言Chat</h2>
 
@@ -19,13 +18,13 @@
         </div>
       </div>
 
-      <!-- 当前用户信息 & 修改按钮 -->
+      <!--当前用户信息及修改按钮-->
       <div v-if="user" style="margin-top: auto; padding: 10px 20px;">
         <p>当前用户：{{ user.username }}</p>
         <button @click="openUserModal">修改个人信息</button>
       </div>
 
-      <!-- 修改用户信息模态框 -->
+      <!--修改用户信息模态框-->
       <div
           v-if="userModal.show"
           class="modal-mask"
@@ -47,7 +46,7 @@
       </div>
     </aside>
 
-    <!-- 聊天区 -->
+    <!--聊天区-->
     <main class="chat-container">
       <header class="chat-header">
         <h1>{{ chatTitle }}</h1>
@@ -76,7 +75,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 export default {
   name: 'Chat',
   data () {
@@ -104,19 +102,19 @@ export default {
     setInterval(this.saveConversation, 3000)
   },
   methods: {
-    /* ---------- 工具 ---------- */
+    /* ===== 工具 ===== */
     genId () {
       return `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     },
     store (k, v) {
-      localStorage.setItem(k, JSON.stringify(v))
+      localStorage.setItem(this.userNs + k, JSON.stringify(v))
     },
     load (k) {
-      const str = localStorage.getItem(k)
+      const str = localStorage.getItem(this.userNs + k)
       return str ? JSON.parse(str) : null
     },
 
-    /* ---------- 用户 ---------- */
+    /* ===== 用户 ===== */
     initUser () {
       const raw = sessionStorage.getItem('user')
       if (!raw) return this.$router.push('/login')
@@ -129,17 +127,17 @@ export default {
       this.$router.push('/login')
     },
 
-    /* ---------- 会话 ---------- */
+    /* ===== 会话 ===== */
     createConversation () {
       const id = this.genId()
       const title = `会话 ${new Date().toLocaleString()}`
       this.conversations.unshift({ id, title, lastActive: Date.now() })
-      this.store(`${this.userNs}conversations`, this.conversations)
+      this.store('conversations', this.conversations)
       this.selectConversation(id)
     },
     selectConversation (id) {
       this.activeId = id
-      const data = this.load(`${this.userNs}${id}`) || { messages: [] }
+      const data = this.load(id) || { messages: [] }
       this.messages = (data.messages || []).map(m => ({
         ...m,
         html: this.render(m.text)
@@ -148,15 +146,14 @@ export default {
     },
     saveConversation () {
       if (!this.activeId) return
-      this.store(`${this.userNs}${this.activeId}`, {
+      this.store(this.activeId, {
         title: this.chatTitle,
         messages: this.messages.map(m => ({ text: m.text, sender: m.sender })),
         lastActive: Date.now()
       })
     },
     loadConversations () {
-      const listKey = `${this.userNs}conversations`
-      this.conversations = this.load(listKey) || []
+      this.conversations = this.load('conversations') || []
       if (this.conversations.length) {
         this.selectConversation(this.conversations[0].id)
       } else {
@@ -164,7 +161,7 @@ export default {
       }
     },
 
-    /* ---------- 消息 ---------- */
+    /* ===== 消息 ===== */
     render (raw) {
       if (!raw) return ''
       let html = raw
@@ -222,13 +219,13 @@ export default {
       })
     },
 
-    /* ---------- 模态框 ---------- */
+    /* ===== 模态框 ===== */
     openUserModal () {
       const { userInfo } = JSON.parse(sessionStorage.getItem('user') || '{}')
       Object.assign(this.userModal.form, {
         username: userInfo.username || '',
-        email:    userInfo.email    || '',
-        password: userInfo.password || ''   // 显示当前密码（已隐藏）
+        email: userInfo.email || '',
+        password: userInfo.password || ''
       })
       this.userModal.show = true
     },
@@ -362,7 +359,7 @@ html, body, #app {
   padding: 12px 16px;
   border-radius: 18px;
 }
-/* 模态框 */
+
 .modal-mask {
   position: fixed;
   inset: 0;
