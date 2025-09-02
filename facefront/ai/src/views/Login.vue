@@ -198,7 +198,7 @@ export default {
                 'user',
                 JSON.stringify({
                   userInfo: {
-                    userId: data.id,
+                    id: data.id,
                     username: data.username,
                     password: data.password,
                     email: data.email
@@ -250,7 +250,7 @@ export default {
                 'user',
                 JSON.stringify({
                   userInfo: {
-                    userId: data.id,
+                    id: data.id,
                     username: data.username,
                     password: data.password,
                     email: data.email
@@ -266,20 +266,17 @@ export default {
 </script>
 
 <style scoped>
-body {
-  font-family: Arial, sans-serif;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  background: #f5f5f5;
-}
 .login-container {
   background: #fff;
-  border-radius: 8px;
-  padding: 30px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  margin-top: 50px;
+  border-radius: 12px;
+  padding: 30px 40px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  margin-top: 10vh;
 }
+
 .login-header {
   text-align: center;
   margin-bottom: 30px;

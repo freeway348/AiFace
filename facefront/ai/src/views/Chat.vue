@@ -2,7 +2,7 @@
   <div class="wrap">
     <!--侧边栏-->
     <aside class="sidebar">
-      <h2>智言医疗助手</h2>
+      <h2>智言法律咨询顾问</h2>
 
       <button @click="createConversation">新建对话</button>
       <button @click="logout">退出登录</button>
