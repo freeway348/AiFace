@@ -121,7 +121,7 @@ export default {
     }
   },
   methods: {
-    /* 通用提示 */
+    // 提示
     showMsg(txt, type = 'info') {
       this.msg = txt
       this.msgType = type
@@ -138,8 +138,7 @@ export default {
           password: this.form.password
         },
         headers: { 'Content-Type': 'application/json' }
-      })
-          .then((res) => {
+      }).then((res) => {
             const data = res.data
             if (!data) return alert('用户名或密码错误')
             sessionStorage.setItem(
@@ -168,8 +167,7 @@ export default {
         url: 'http://localhost:9999/user/mail',
         data: { email: this.form.email },
         headers: { 'Content-Type': 'application/json' }
-      })
-          .then(() => {
+      }).then(() => {
             this.showMsg('验证码已发送', 'success')
             const timer = setInterval(() => {
               this.count--
@@ -179,8 +177,7 @@ export default {
                 this.count = 60
               }
             }, 1000)
-          })
-          .catch((e) => {
+          }).catch((e) => {
             this.counting = false
             this.showMsg(e?.response?.data || '发送失败', 'error')
           })
@@ -195,8 +192,7 @@ export default {
         url: 'http://localhost:9999/user/loginMail',
         data: { email: this.form.email, code: this.form.emailCode },
         headers: { 'Content-Type': 'application/json' }
-      })
-          .then((res) => {
+      }).then((res) => {
             const data = res.data
             sessionStorage.setItem(
                 'user',
@@ -211,8 +207,7 @@ export default {
                 })
             )
             this.$router.push('/chat')
-          })
-          .catch((e) => this.showMsg(e?.response?.data || '登录失败', 'error'))
+          }).catch((e) => this.showMsg(e?.response?.data || '登录失败', 'error'))
     },
 
     // 打开摄像头
@@ -223,8 +218,7 @@ export default {
             this.stream = st
             this.$refs.video.srcObject = st
             this.cameraOpened = true
-          })
-          .catch(() => this.showMsg('无法访问摄像头', 'error'))
+          }).catch(() => this.showMsg('无法访问摄像头', 'error'))
     },
 
     // 拍照
@@ -250,8 +244,7 @@ export default {
         url: 'http://localhost:9999/user/loginFace',
         data: { imagetoken: base64 },
         headers: { 'Content-Type': 'application/json' }
-      })
-          .then((res) => {
+      }).then((res) => {
             const data = res.data
             sessionStorage.setItem(
                 'user',
@@ -266,8 +259,7 @@ export default {
                 })
             )
             this.$router.push('/chat')
-          })
-          .catch((e) => this.showMsg(e?.response?.data || '登录失败', 'error'))
+          }).catch((e) => this.showMsg(e?.response?.data || '登录失败', 'error'))
     }
   }
 }

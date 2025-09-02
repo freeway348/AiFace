@@ -4,7 +4,7 @@
       <h1 class="page-title">用户信息注册系统</h1>
 
       <div class="content-wrapper">
-        <!-- 左侧表单 -->
+        <!--左侧表单-->
         <div class="form-panel">
           <label class="form-label">用户名</label>
           <input v-model="username" placeholder="请输入用户名" class="form-input" />
@@ -18,7 +18,7 @@
           <label class="form-label">验证码</label>
           <input v-model="veriCode" placeholder="请输入验证码" class="form-input" />
 
-          <!-- 表单按钮 -->
+          <!--表单按钮-->
           <div class="form-actions">
             <button @click="sendVerificationCode" :disabled="isVeriButtonDisabled">
               {{ veriButtonText }}
@@ -131,28 +131,27 @@ export default {
     },
 
 
-    async sendVerificationCode () {
+    sendVerificationCode () {
       if (!this.email) {
         this.showMessage('请先填写邮箱地址', 'error')
         return
       }
       this.isVeriButtonDisabled = true
       this.veriButtonText = '发送中...'
-      try {
-        // 等待异步
-        await this.$axios({
-          method: 'POST',
-          url: 'http://localhost:9999/user/mail',
-          data: { email: this.email },
-          headers: { 'Content-Type': 'application/json' }
-        })
+
+      this.$axios({
+        method: 'POST',
+        url: 'http://localhost:9999/user/mail',
+        data: { email: this.email },
+        headers: { 'Content-Type': 'application/json' }
+      }).then(() => {
         this.showMessage('验证码已发送至您的邮箱，请查收！', 'success')
         this.startCountdown(60)
-      } catch (e) {
+      }).catch(e => {
         this.showMessage('发送验证码失败: ' + (e?.response?.data || e.message), 'error')
         this.isVeriButtonDisabled = false
         this.veriButtonText = '获取验证码'
-      }
+      })
     },
 
     // 倒计时
@@ -170,7 +169,7 @@ export default {
       }, 1000)
     },
 
-    async registerUser () {
+    registerUser() {
       if (!this.username || !this.password || !this.email || !this.veriCode) {
         this.showMessage('请填写所有必填字段', 'error')
         return
@@ -180,24 +179,30 @@ export default {
         return
       }
       const imageBase64 = this.photoSrc.split(',')[1]
-      try {
-        await this.$axios({
-          method: 'POST',
-          url: 'http://localhost:9999/user/register',
-          data: {
-            username: this.username,
-            password: this.password,
-            email: this.email,
-            code: this.veriCode,
-            imageBase64
-          },
-          headers: { 'Content-Type': 'application/json' }
-        })
-        this.showMessage('注册成功！即将跳转登录页...', 'success')
-        setTimeout(() => this.$router.push('/login'), 1500)
-      } catch (e) {
+
+      this.$axios({
+        method: 'POST',
+        url: 'http://localhost:9999/user/register',
+        data: {
+          username: this.username,
+          password: this.password,
+          email: this.email,
+          code: this.veriCode,
+          imageBase64
+        },
+        headers: { 'Content-Type': 'application/json' }
+      }).then(res => {
+        console.log(res);
+        // 如果后端传来的res为"fail"，则输出注册失败
+        if (res.data === "fail") {
+          this.showMessage('注册失败: ' + (e?.response?.data || e.message), 'error')
+        }else{
+          this.showMessage('注册成功！即将跳转登录页...', 'success')
+          setTimeout(() => this.$router.push('/login'), 1500)
+        }
+      }).catch(e => {
         this.showMessage('注册失败: ' + (e?.response?.data || e.message), 'error')
-      }
+      })
     },
 
 

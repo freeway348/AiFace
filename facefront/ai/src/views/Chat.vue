@@ -2,7 +2,7 @@
   <div class="wrap">
     <!--侧边栏-->
     <aside class="sidebar">
-      <h2>智言Chat</h2>
+      <h2>智言医疗助手</h2>
 
       <button @click="createConversation">新建对话</button>
       <button @click="logout">退出登录</button>
@@ -94,7 +94,7 @@ export default {
   },
   computed: {
     userNs () {
-      return this.user ? `user_${this.user.userId}_` : ''
+      return this.user ? `user_${this.user.id}_` : ''
     }
   },
   mounted () {
@@ -102,7 +102,6 @@ export default {
     setInterval(this.saveConversation, 3000)
   },
   methods: {
-    /* ===== 工具 ===== */
     genId () {
       return `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
     },
@@ -114,7 +113,7 @@ export default {
       return str ? JSON.parse(str) : null
     },
 
-    /* ===== 用户 ===== */
+    // 用户
     initUser () {
       const raw = sessionStorage.getItem('user')
       if (!raw) return this.$router.push('/login')
@@ -127,7 +126,7 @@ export default {
       this.$router.push('/login')
     },
 
-    /* ===== 会话 ===== */
+    // 会话
     createConversation () {
       const id = this.genId()
       const title = `会话 ${new Date().toLocaleString()}`
@@ -161,29 +160,22 @@ export default {
       }
     },
 
-    /* ===== 消息 ===== */
+    // 消息
     render (raw) {
       if (!raw) return ''
       let html = raw
           .replace(/<think>[\s\S]*?<\/think>/gi, '')
-          .replace(/\n{2,}/g, '\n')
           .replace(/^\s+|\s+$/g, '')
 
-      html = html
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
 
       html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>')
       html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>')
       html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>')
 
-      html = html.replace(/^- (.+)$/gm, '<li>$1</li>')
       html = html.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
 
       html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-      html = html.replace(/`([^`]+)`/g, '<code>$1</code>')
-      html = html.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+      html = html.replace(/\n{2,}/g, '\n')
       html = html.replace(/\n/g, '<br>')
       return html
     },
@@ -207,6 +199,7 @@ export default {
         data: { question: q },
         headers: { 'Content-Type': 'application/json' }
       }).then(res => {
+        console.log(res);
         const ans = res.data.message?.content || '抱歉，未能获取回答内容。'
         this.messages.push({ text: ans, sender: 'ai', html: this.render(ans) })
         this.scroll()
@@ -219,7 +212,7 @@ export default {
       })
     },
 
-    /* ===== 模态框 ===== */
+    // 模态框
     openUserModal () {
       const { userInfo } = JSON.parse(sessionStorage.getItem('user') || '{}')
       Object.assign(this.userModal.form, {
@@ -238,7 +231,7 @@ export default {
         method: 'PUT',
         url: 'http://localhost:9999/user/update',
         data: {
-          userId: userInfo.userId,
+          id: userInfo.id,
           username: this.userModal.form.username,
           email: this.userModal.form.email,
           password: this.userModal.form.password || undefined
